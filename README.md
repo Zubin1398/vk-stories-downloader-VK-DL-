@@ -1,73 +1,164 @@
+````md
 # VK Stories Video Downloader
 
 ## Project Overview
 
-Пользовательский скрипт Tampermonkey/Greasemonkey для загрузки видео из VK stories (ВКонтакте).
-**Скрипт _обходит_ Политику безопасности контента** Вконтакте **(CSP)**, внедряя код непосредственно в контекст страницы, что позволяет перехватывать сетевые запросы и извлекать прямые URL-адреса видео.
+Пользовательский скрипт для Tampermonkey/Greasemonkey, предназначенный для загрузки видео из VK Stories.
 
-** Ключевые особенности:**
-- Перехватывает вызовы "fetch" и "XMLHttpRequest" для получения ответов на URL-адреса видео
-- Обнаруживает элементы `<video>` в DOM
-- Поддерживает несколько доменов ВКОНТАКТЕ: `vk.com`, `*.vk.com`, "vk.ru`, `*.vk.ru`
-- Зеленая пульсирующая кнопка (в левом нижнем углу) для доступа к панели загрузки
-- Панель загрузки с опциями "Загрузить", "Открыть", "Скопировать URL" или "Очистить" список.
-- Сопоставление шаблонов для URL-адресов ".mp4", ".m3u8" и CDN-адресов ВКОНТАКТЕ ("sun*", "psv*", "vkvideo*", "cs*")
+Скрипт обходит Content Security Policy (CSP) ВКонтакте, внедряя код непосредственно в контекст страницы. Это позволяет перехватывать сетевые запросы и извлекать прямые URL-адреса видео.
 
-## Установка
+---
 
-1. Установите ** Расширение для браузера Tampermonkey**:
-   - Chrome: [Интернет-магазин Chrome](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
-   - Firefox: [Дополнения для Firefox](https://addons.mozilla.org/firefox/addon/tampermonkey/)
-   - Edge: [Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/tampermonkey/iikmkjmpaadaobahmlepeloendndfphd)
+## Key Features
 
-2. Откройте `vk-stories-downloader.user.js` в вашем браузере — Tampermonkey предложит установить его.
+- Перехват `fetch` и `XMLHttpRequest` для получения URL-адресов видео
+- Автоматическое обнаружение элементов `<video>` в DOM
+- Поддержка доменов:
+  - `vk.com`
+  - `*.vk.com`
+  - `vk.ru`
+  - `*.vk.ru`
+- Зеленая пульсирующая кнопка в левом нижнем углу
+- Панель управления видео:
+  - `Download`
+  - `Open`
+  - `Copy URL`
+  - `Clear List`
+- Поддержка:
+  - `.mp4`
+  - `.m3u8`
+  - CDN-адресов VK (`sun*`, `psv*`, `vkvideo*`, `cs*`)
 
-3. Убедитесь, что в настройках вашего браузера включены пользовательские скрипты и режим разработчика.
+---
 
-## Использование
+# Installation
 
-1. Перейдите в "ВКОНТАКТЕ" и откройте историю, содержащую видео
-2. В левом нижнем углу появится зеленая кнопка (с красной рамкой)**
-3. Нажмите на кнопку, чтобы открыть панель "Видео".**
-4. На панели отобразятся все обнаруженные видео с пронумерованными зелеными значками
-5. Для каждого видео нажмите:
-   - *** Скачивать** — открывает URL- адрес в новой вкладке для загрузки
-   - *** Открыть** — открывает URL - адрес видео напрямую
-   - ** Копировать** — копирует URL в буфер обмена
-   - ** Копировать** — очищает список видео без перезагрузки страницы
+## 1. Установите Tampermonkey
 
-## Технические подробности
+- Chrome — [Chrome Web Store](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
+- Firefox — [Firefox Add-ons](https://addons.mozilla.org/firefox/addon/tampermonkey/)
+- Edge — [Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/tampermonkey/iikmkjmpaadaobahmlepeloendndfphd)
 
-### Как это работает
+## 2. Установите скрипт
 
-1. ** Обход CSP**: Скрипт использует внедрение "запуск документа" и создает элемент "<script>" с фактическим кодом в качестве текстового содержимого, выполняя его в контексте страницы, а не в изолированном контексте расширения.
+Откройте файл:
 
-2. **Сетевой перехват **: Обертывает `window.fetch" и "XMLHttpRequest.prototype.open/send" для получения ответов от конечных точек видео API ВКОНТАКТЕ (URL-адреса, содержащие "video", `story`, `al_`).
+```text
+vk-stories-downloader.user.js
+```
 
-3. ** Извлечение URL-адресов **: Использует шаблоны регулярных выражений для поиска URL-адресов видео в тексте ответа:
-   - Прямые URL-адреса ".mp4" и ".m3u8".
-   - URL-адреса CDN ВКОНТАКТЕ (`sun*`, `psv*`, `vkvideo*`, `cs*`)
+Tampermonkey автоматически предложит установить скрипт.
 
-4. **Мониторинг DOM**: использует "MutationObserver" с регулированием ("requestAnimationFrame") для обнаружения элементов "<видео>", добавленных на страницу.
+## 3. Проверьте настройки браузера
 
-### Меры по устранению задержек
+Убедитесь, что:
+- включены пользовательские скрипты
+- активирован Developer Mode
 
-- Защита при однократном запуске (`window.__vkDLRunning` / `window.__vkDLInner`)
-- Ограниченные проверки DOM (минимум каждые 3 секунды)
-- `requestAnimationFrame` для обратных вызовов observer
-- Минимальный вывод данных для отладки (только для консоли, без постоянных обновлений DOM)
+---
 
-## Технологии
+# Usage
 
-- **JavaScript** (ES6+)
-- **Tampermonkey/Greasemonkey** API
-- Веб-интерфейс ВКонтакте (SPA, интерфейс на основе React)
+1. Откройте VK Stories
+2. В левом нижнем углу появится зеленая кнопка
+3. Нажмите на неё для открытия панели Video Downloader
+4. Скрипт автоматически обнаружит все видео на странице
 
-## История версий
+Для каждого видео доступны действия:
 
-| Версия | Примечания |
-|---------|-------|
-| 1.0 | Начальная версия — базовая выборка/перехват XHR |
-| 2.0 | Добавлена панель отладки, расширены шаблоны URL-адресов, внедрение "запуска документа" |
-| 3.0 | Обход CSP с помощью внедрения в контекст страницы |
-| 3.1 | Исправлены проблемы с задержкой — защита при однократном запуске, ограниченные проверки, кнопка перемещена влево, добавлена функция очистки |
+- **Download** — открыть URL для загрузки
+- **Open** — открыть видео напрямую
+- **Copy URL** — скопировать ссылку
+- **Clear List** — очистить список видео
+
+---
+
+# Technical Details
+
+## How It Works
+
+### 1. CSP Bypass
+
+Скрипт использует `document-start injection` и внедряет `<script>` напрямую в контекст страницы, что позволяет выполнять код вне sandbox-контекста расширения.
+
+### 2. Network Interception
+
+Перехватываются:
+
+```js
+window.fetch
+XMLHttpRequest.prototype.open
+XMLHttpRequest.prototype.send
+```
+
+Для анализа ответов API, содержащих:
+
+```text
+video
+story
+al_
+```
+
+### 3. URL Extraction
+
+Используются регулярные выражения для поиска:
+
+- `.mp4`
+- `.m3u8`
+- CDN URL:
+  - `sun*`
+  - `psv*`
+  - `vkvideo*`
+  - `cs*`
+
+### 4. DOM Monitoring
+
+Используется:
+
+```js
+MutationObserver
+```
+
+совместно с:
+
+```js
+requestAnimationFrame
+```
+
+для обнаружения динамически добавляемых элементов `<video>`.
+
+---
+
+# Performance Optimizations
+
+- Защита от повторного запуска:
+
+```js
+window.__vkDLRunning
+window.__vkDLInner
+```
+
+- Ограниченные проверки DOM
+- Минимальная нагрузка на страницу
+- `requestAnimationFrame` throttling
+- Минимальный debug output
+
+---
+
+# Technologies
+
+- JavaScript (ES6+)
+- Tampermonkey / Greasemonkey API
+- React-based VK SPA interface
+
+---
+
+# Version History
+
+| Version | Notes |
+|----------|-------|
+| 1.0 | Базовый fetch/XHR interception |
+| 2.0 | Добавлена debug panel и document-start injection |
+| 3.0 | CSP bypass через page-context injection |
+| 3.1 | Оптимизация производительности, anti-lag fixes, clear button |
+````
