@@ -3,6 +3,7 @@
 // @namespace    http://tampermonkey.net/
 // @version      3.1
 // @description  Скачивает видео из историй ВКонтакте — обход CSP
+// @author       -Inet
 // @match        https://vk.com/*
 // @match        https://*.vk.com/*
 // @match        https://vk.ru/*
