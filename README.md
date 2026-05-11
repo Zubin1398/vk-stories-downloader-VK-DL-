@@ -1,4 +1,4 @@
-````md
+
 # VK Stories Video Downloader
 
 ## Project Overview
@@ -161,4 +161,4 @@ window.__vkDLInner
 | 2.0 | Добавлена debug panel и document-start injection |
 | 3.0 | CSP bypass через page-context injection |
 | 3.1 | Оптимизация производительности, anti-lag fixes, clear button |
-````
+
